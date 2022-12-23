@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <script>
+      const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (file == null) return;
+        fetch("/fileUpload", {
+          headers: {
+            filename: file.name,
+          },
+          method: "POST",
+          body: file,
+        })
+          .then((response) => {
+            let contentType = response.headers.get("Content-Type");
+            response
+              .text()
+              .then((text) => {
+                document.getElementById(
+                  "img"
+                ).src = `data:${contentType};base64,${text}`;
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      };
+      function init() {
+        document
+          .getElementById("fileUpload")
+          .addEventListener("change", (event) => {
+            handleImageUpload(event);
+          });
+      }
+    </script>
+  </head>
+  <body onload="init()">
+    <input id="fileUpload" type="file" accept="image/*" /><br />
+    <img id="img" alt="Uploaded image" />
+  </body>
+</html>
